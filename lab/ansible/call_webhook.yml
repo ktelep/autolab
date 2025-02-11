@@ -1,0 +1,58 @@
+---
+- name: Update VM playbook
+  hosts: localhost
+  gather_facts: false
+  collections:
+    - nutanix.ncp
+  module_defaults:
+    group/nutanix.ncp.ntnx:
+      nutanix_host: "<PRISM CENTRAL IP>"
+      nutanix_username: "<PRISM CENTRAL USER>"
+      nutanix_password: "<PRISM CENTRAL PASSWORD>"
+      validate_certs: false
+  tasks:
+  - name: Setting Variables
+    set_fact:
+        cluster_name: "BLR-POC227"
+        vm_name_to_update: "User##-Ansible"
+
+  - name: Locating VM UUID
+    ntnx_vms_info:
+      filter:
+        vm_name: "{{ vm_name_to_update }}"
+    register: vms
+
+  - name: Parse out VM UUID
+    set_fact:
+       updated_vm_uuid: "{{ vms.response.entities[0].metadata.uuid }}"
+       vm_entity1: 
+          type: "vm"
+          name: "{{ vm_name_to_update }}"
+          uuid: "{{ vms.response.entities[0].metadata.uuid }}"
+
+  - name: Print result
+    ansible.builtin.debug:
+      var: updated_vm_uuid
+    when: updated_vm_uuid is defined
+
+  - name: Print user
+    ansible.builtin.debug:
+      var: nutanix.ncp.ntnx.nutanix_username
+    when: nutanix.ncp.ntnx.nutanix_username is defined
+ 
+  - name: Call Playbook Webhook
+    uri:
+        url_username: "<PRISM CENTRAL USERNAME>"
+        url_password: "<PRISM CENTRAL PASSWORD>"
+        body:
+          trigger_type: incoming_webhook_trigger
+          trigger_instance_list:
+            - webhook_id: 9ac46ff9-ccb7-4d17-b168-e27502cafe8f
+              entity1: "{{ vm_entity1 | to_json | string }}"
+        method: POST
+        url: https://10.136.227.7:9440/api/nutanix/v3/action_rules/trigger
+        validate_certs: no
+        body_format: json
+        force_basic_auth: true
+        status_code: [200, 202]
+

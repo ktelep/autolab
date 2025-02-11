@@ -6,9 +6,9 @@
     - nutanix.ncp
   module_defaults:
     group/nutanix.ncp.ntnx:
-      nutanix_host: <PRISM CENTRAL IP>
-      nutanix_username: <PRISM CENTRAL USER>
-      nutanix_password: <PRISM CENTRAL PASSWORD>
+      nutanix_host: "<PRISM CENTRAL IP>"
+      nutanix_username: "<PRISM CENTRAL USERNAME>"
+      nutanix_password: "<PRISM CENTRAL PASSWORD>"
       validate_certs: false
   tasks:
   - name: Setting Variables
