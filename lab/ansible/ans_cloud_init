@@ -1,0 +1,13 @@
+#cloud-config
+fqdn: user20
+ssh_pwauth: true
+users:
+  - name: nutanix
+    ssh_pwauth: True
+    sudo: ['ALL=(ALL) NOPASSWD:ALL']
+chpasswd:
+chpasswd:
+  list: |
+    root:nutanix/4u
+    nutanix:nutanix/4u
+  expire: False

@@ -1,0 +1,53 @@
+---
+- name: VM playbook
+  hosts: localhost
+  gather_facts: false
+  collections:
+    - nutanix.ncp
+  module_defaults:
+    group/nutanix.ncp.ntnx:
+      nutanix_host: <PRISM CENTRAL IP>
+      nutanix_username: <PRISM CENTRAL USER>
+      nutanix_password: <PRISM CENTRAL PASSWORD>
+      validate_certs: false
+  tasks:
+  - name: Setting Variables
+    set_fact:
+        my_vm: "User##-Ansible"
+        script_path: "ans_cloud_init"
+        cluster_name: "BLR-POC227"
+        subnet_name: "primary"
+        image_name: "Rocky-9-GenericCloud-Base.latest.x86_64.qcow2"
+
+  - name: create Vm
+    ntnx_vms:
+      state: present
+      name: "{{my_vm}}"
+      desc: "VM Created with Ansible"
+      categories:
+        AppType:
+          - "Apache_Spark"
+      cluster:
+        name: "{{cluster_name}}"
+      networks:
+        - is_connected: True
+          subnet:
+            name: "{{ subnet_name }}"
+      disks:
+        - type: "DISK"
+          size_gb: 30
+          bus: "SATA"
+          clone_image:
+            name: "{{ image_name }}"
+      vcpus: 1
+      cores_per_vcpu: 2
+      memory_gb: 2
+      guest_customization:
+        type: "cloud_init"
+        script_path: "{{ script_path }}"
+        is_overridable: True
+    register: output
+
+  - name: output of vm created
+    debug:
+      msg: '{{ output }}'

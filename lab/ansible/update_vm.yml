@@ -1,0 +1,48 @@
+---
+- name: Update VM playbook
+  hosts: localhost
+  gather_facts: false
+  collections:
+    - nutanix.ncp
+  module_defaults:
+    group/nutanix.ncp.ntnx:
+      nutanix_host: <PRISM CENTRAL IP>
+      nutanix_username: <PRISM CENTRAL USER>
+      nutanix_password: <PRISM CENTRAL PASSWORD>
+      validate_certs: false
+  tasks:
+  - name: Setting Variables
+    set_fact:
+        cluster_name: "BLR-POC227"
+        vm_name_to_update: "User##-Ansible"
+
+  - name: Locating VM UUID
+    ntnx_vms_info:
+      filter:
+        vm_name: "{{ vm_name_to_update }}"
+    register: vms
+
+  - name: Parse out VM UUID
+    set_fact:
+       updated_vm_uuid: "{{ vms.response.entities[0].metadata.uuid }}"
+
+  - name: Print result
+    ansible.builtin.debug:
+      var: updated_vm_uuid
+    when: updated_vm_uuid is defined
+
+  - name: Update VM
+    ntnx_vms:
+      vm_uuid: "{{ updated_vm_uuid }}"
+      vcpus: 1
+      cores_per_vcpu: 8
+      force_power_off: true
+      disks:
+        - type: DISK
+          size_gb: 10
+          bus: SCSI
+    register: output
+
+  - name: output of vm created
+    debug:
+      msg: '{{ output }}'

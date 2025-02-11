@@ -1,0 +1,5 @@
+cluster_name = "BLR-POC227"
+subnet_name  = "primary"
+user         = "<PRISM CENTRAL USERNAME>"
+endpoint     = "<PRISM CENTRAL IP>"
+password     = "<PRISM CENTRAL PASSWORD>"
