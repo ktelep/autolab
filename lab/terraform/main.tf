@@ -2,7 +2,7 @@ terraform {
   required_providers {
     nutanix = {
       source  = "nutanix/nutanix"
-      version = "1.9.4"
+      version = "2.2.0"
     }
   }
 }
@@ -40,7 +40,7 @@ resource "nutanix_virtual_machine" "vm" {
   disk_list {
     data_source_reference = {
       kind = "image"
-      uuid = "33f9ccd1-e578-4567-9971-43f90187b9f9"
+      uuid = "ee777a8a-103e-418e-9d61-1140de998963"
     }
   }
 
